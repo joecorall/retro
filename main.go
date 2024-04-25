@@ -180,8 +180,8 @@ func gptSummarize(work string) (GptResponse, error) {
 		"When you reference a PR just provide the URL to it with no markdown formatting",
 		"Your summaries should be able to be pasted in Slack so only use markdown slack can render",
 		"Whenever you are asked to summarize work, after you've provided your summary, your last sentence should be: \"In addition, there were X commits and Y PRs across Z repositories worked on this week.\" where you replace X, Y, Z with the numbers you summarized",
-		"A great example summary you should aim to produce based on the input you receive is like:",
 		"When someone gives you their github username, make sure you use it in the first sentence in the summary so everyone reading knows who did what",
+		"A great example summary you should aim to produce based on the input you receive is like:",
 		`This week, joecorall worked on several projects primarily related to the Islandora Repository. Here is a brief rundown:
 
 * PR https://github.com/Islandora-Devops/isle-dc/pull/390 was about adding a test for config export functionality through UI in Drupal admin.
