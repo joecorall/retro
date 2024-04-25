@@ -1,0 +1,26 @@
+name: summarize
+on:
+  workflow_dispatch:
+  schedule:
+    # Thursdays 12:15 EST
+    - cron: '15 16 * * 4'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  run:
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      IGNORE_ORGS: LibOps,joecorall
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+      - name: Install dependencies
+        run: go get .
+      - name: Run
+        run: go run main.go
