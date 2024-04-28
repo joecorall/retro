@@ -7,11 +7,12 @@ import (
 	"os"
 )
 
-func SendToSlack(summary string) error {
-	webhookURL := os.Getenv("SLACK_WEBHOOK_URL")
+func SendToSlack(webhookURL, summary string) error {
+	if webhookURL == "" {
+		webhookURL = os.Getenv("SLACK_WEBHOOK_URL")
+	}
 	if webhookURL == "" {
 		return fmt.Errorf("SLACK_WEBHOOK_URL is not set")
-
 	}
 
 	jsonData := []byte(fmt.Sprintf(`
