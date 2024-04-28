@@ -1,39 +1,90 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"log/slog"
+	"net/http"
 	"os"
 
 	"github.com/joecorall/retro/internal/thirdparty"
 )
 
+type Message struct {
+	GitHubActor     string `json:"github_actor"`
+	SlackWebhookUrl string `json:"slack_webhook_url"`
+}
+
 func init() {
-	if os.Getenv("GITHUB_TOKEN") == "" || os.Getenv("GITHUB_ACTOR") == "" || os.Getenv("OPENAI_API_KEY") == "" {
-		slog.Error("GITHUB_TOKEN, GITHUB_ACTOR, OPENAI_API_KEY, and SLACK_WEBHOOK_URL environment variables are required")
+	if os.Getenv("GITHUB_TOKEN") == "" || os.Getenv("OPENAI_API_KEY") == "" {
+		slog.Error("GITHUB_TOKEN and OPENAI_API_KEY environment variables are required")
 		os.Exit(1)
 	}
 }
 
 func main() {
-	author := os.Getenv("GITHUB_ACTOR")
-	work := thirdparty.FindGitHubIssuesAndCommits(author)
-	summary, err := thirdparty.GptSummarize(author, work)
-	if err != nil {
-		slog.Error("Unable to summarize work", "err", err)
-		os.Exit(1)
+	http.HandleFunc("/", MessageHandler)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
 
-	if os.Getenv("SLACK_WEBHOOK_URL") == "" {
-		fmt.Print(summary.Choices[0].Message.Content)
+	slog.Info("Server listening", "port", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		panic(err)
+	}
+}
+
+func MessageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
-	err = thirdparty.SendToSlack(summary.Choices[0].Message.Content)
+	decoder := json.NewDecoder(r.Body)
+	var m Message
+	err := decoder.Decode(&m)
 	if err != nil {
-		slog.Error("Unable to send summary to slack", "err", err)
-		os.Exit(1)
+		slog.Error("Unable to summarize work", "err", err)
+		http.Error(w, "Unprocessable Content", http.StatusInternalServerError)
+		return
 	}
 
-	slog.Info("Successfully sent summary to slack")
+	if m.GitHubActor == "" {
+		http.Error(w, "No GitHub username passed", http.StatusBadRequest)
+		return
+	}
+
+	work := thirdparty.FindGitHubIssuesAndCommits(m.GitHubActor)
+	if work == "" {
+		http.Error(w, "Unprocessable entity", http.StatusUnprocessableEntity)
+		return
+	}
+
+	summary, err := thirdparty.GptSummarize(m.GitHubActor, work)
+	if err != nil {
+		slog.Error("Unable to summarize work", "err", err)
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+		return
+	}
+
+	if m.SlackWebhookUrl == "" && os.Getenv("SLACK_WEBHOOK_URL") == "" {
+		if _, err := w.Write([]byte(summary.Choices[0].Message.Content)); err != nil {
+			slog.Error("Error writing summary to responsewriter", "err", err)
+			http.Error(w, "Internal error", http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+
+	err = thirdparty.SendToSlack(m.SlackWebhookUrl, summary.Choices[0].Message.Content)
+	if err != nil {
+		slog.Error("Unable to send summary to slack", "err", err)
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+		return
+	}
+
+	if _, err := w.Write([]byte("Successfully sent summary to slack")); err != nil {
+		slog.Error("Error writing success to responsewriter", "err", err)
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+	}
 }

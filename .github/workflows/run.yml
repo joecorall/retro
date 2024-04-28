@@ -23,5 +23,13 @@ jobs:
       - uses: actions/setup-go@v4
       - name: Install dependencies
         run: go get .
-      - name: Run
-        run: go run main.go
+
+      - name: Start server
+        run: go run main.go &
+
+      - name: Send request
+        run: |-
+          curl \
+            --silent \
+            -d '{"github_actor": "'${GITHUB_ACTOR}'"}' \
+            http://localhost:8080/
