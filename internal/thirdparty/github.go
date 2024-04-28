@@ -42,7 +42,7 @@ func FindGitHubIssuesAndCommits(author string) string {
 		results, resp, err := client.Search.Issues(ctx, query, opt)
 		if err != nil {
 			slog.Error("Error searching pull request", "err", err)
-			os.Exit(1)
+			return ""
 		}
 
 		for _, pr := range results.Issues {
@@ -85,7 +85,7 @@ func FindGitHubIssuesAndCommits(author string) string {
 		results, resp, err := client.Search.Commits(ctx, query, opt)
 		if err != nil {
 			slog.Error("Error searching pull requests", "err", err)
-			os.Exit(1)
+			return ""
 		}
 		for _, commit := range results.Commits {
 			match := re.FindStringSubmatch(*commit.Commit.URL)
