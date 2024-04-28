@@ -18,7 +18,7 @@ Sends the summary to a slack webhook URL
 
 | Env Var Name       | Explanation                                                                |
 |------------------- |--------------------------------------------------------------------------- |
-| `SLACK_WEBHOOK_URL`| Your summary will be sent to this URL as `curl -d {"msg": "YOUR_SUMMARY"}` |
+| `SLACK_WEBHOOK_URL`| Your summary will be sent to this URL as `curl -d {"text": "YOUR_SUMMARY"}` |
 | `GITHUB_TOKEN`     | Your GitHub token so you can read commmits and PRs from private repos      |
 | `GITHUB_ACTOR`     | Your GitHub username                                                       |
 | `OPENAI_API_KEY`   | Your OpenAI API Key that can write to `/v1/chat/completions`               |
