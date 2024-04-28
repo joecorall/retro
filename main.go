@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -8,7 +9,7 @@ import (
 )
 
 func init() {
-	if os.Getenv("GITHUB_TOKEN") == "" || os.Getenv("GITHUB_ACTOR") == "" || os.Getenv("OPENAI_API_KEY") == "" || os.Getenv("SLACK_WEBHOOK_URL") == "" {
+	if os.Getenv("GITHUB_TOKEN") == "" || os.Getenv("GITHUB_ACTOR") == "" || os.Getenv("OPENAI_API_KEY") == "" {
 		slog.Error("GITHUB_TOKEN, GITHUB_ACTOR, OPENAI_API_KEY, and SLACK_WEBHOOK_URL environment variables are required")
 		os.Exit(1)
 	}
@@ -23,7 +24,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	// todo: other options to get summary?
+	if os.Getenv("SLACK_WEBHOOK_URL") == "" {
+		fmt.Print(summary.Choices[0].Message.Content)
+		return
+	}
+
 	err = thirdparty.SendToSlack(summary.Choices[0].Message.Content)
 	if err != nil {
 		slog.Error("Unable to send summary to slack", "err", err)
