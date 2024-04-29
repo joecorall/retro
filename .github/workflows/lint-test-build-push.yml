@@ -13,6 +13,9 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.54
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          verbose: true
       - name: Install dependencies
         run: go get .
       - name: Build
@@ -22,3 +25,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
+  build-push-ar:
+    needs: [lint-test]
+    uses: libops/actions/.github/workflows/build-push.yml@main
+    with:
+      image: shared/retro
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit
