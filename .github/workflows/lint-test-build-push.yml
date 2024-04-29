@@ -63,9 +63,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
-        context: ${{ inputs.context }}
         push: true
-        build-args: ${{ inputs.build-args }}
         tags: |
-          us-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/${{ inputs.image }}:${{steps.extract_branch.outputs.branch}}-${{steps.extract_tag.outputs.tag}}
-          us-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/${{ inputs.image }}:${{steps.extract_branch.outputs.branch}}
+          us-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/shared/retro:${{steps.extract_branch.outputs.branch}}-${{steps.extract_tag.outputs.tag}}
+          us-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT }}/shared/retro:${{steps.extract_branch.outputs.branch}}
