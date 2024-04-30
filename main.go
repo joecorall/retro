@@ -10,8 +10,11 @@ import (
 )
 
 type Message struct {
-	GitHubActor     string `json:"github_actor"`
-	SlackWebhookUrl string `json:"slack_webhook_url"`
+	GitHubActor string `json:"github_actor"`
+	// comma separated list of GitHub organizations
+	// not to include in the summary
+	GitHubIgnoredOrgs string `json:"github_ignored_orgs"`
+	SlackWebhookUrl   string `json:"slack_webhook_url"`
 }
 
 func init() {
@@ -54,7 +57,7 @@ func MessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	work := thirdparty.FindGitHubIssuesAndCommits(m.GitHubActor)
+	work := thirdparty.FindGitHubIssuesAndCommits(m.GitHubActor, m.GitHubIgnoredOrgs)
 	if work == "" {
 		http.Error(w, "Unprocessable entity", http.StatusUnprocessableEntity)
 		return
