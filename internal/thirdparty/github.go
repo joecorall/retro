@@ -38,7 +38,7 @@ func FindGitHubIssuesAndCommits(author, filterOrg string) string {
 	}
 	ignoredOrgs := strings.Split(filterOrg, ",")
 	for i, org := range ignoredOrgs {
-		ignoredOrgs[i] = strings.TrimSpace(org)
+		ignoredOrgs[i] = strings.ToLower(strings.TrimSpace(org))
 	}
 
 	re := regexp.MustCompile(`https://api\.github\.com/repos/([^/]+)/`)
@@ -55,7 +55,7 @@ func FindGitHubIssuesAndCommits(author, filterOrg string) string {
 			if match == nil || len(match) != 2 {
 				continue
 			}
-			if strInSlice(match[1], ignoredOrgs) {
+			if strInSlice(strings.ToLower(match[1]), ignoredOrgs) {
 				continue
 			}
 			// you can not filter by date on PRs
@@ -98,7 +98,7 @@ func FindGitHubIssuesAndCommits(author, filterOrg string) string {
 			if match == nil || len(match) != 2 {
 				continue
 			}
-			if strInSlice(match[1], ignoredOrgs) {
+			if strInSlice(strings.ToLower(match[1]), ignoredOrgs) {
 				continue
 			}
 
