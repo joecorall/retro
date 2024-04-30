@@ -13,7 +13,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func FindGitHubIssuesAndCommits(author string) string {
+func FindGitHubIssuesAndCommits(author, filterOrg string) string {
 	ctx := context.Background()
 	token := os.Getenv("GITHUB_TOKEN")
 	// auth to GitHub
@@ -33,8 +33,13 @@ func FindGitHubIssuesAndCommits(author string) string {
 	}
 
 	// do not summarize commits on unrelated orgs
-	filterOrg := os.Getenv("IGNORE_ORGS")
+	if filterOrg == "" {
+		filterOrg = os.Getenv("IGNORE_ORGS")
+	}
 	ignoredOrgs := strings.Split(filterOrg, ",")
+	for i, org := range ignoredOrgs {
+		ignoredOrgs[i] = strings.TrimSpace(org)
+	}
 
 	re := regexp.MustCompile(`https://api\.github\.com/repos/([^/]+)/`)
 	var allPRs []*github.Issue
