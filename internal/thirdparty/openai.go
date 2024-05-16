@@ -31,26 +31,26 @@ func GptSummarize(author, work string) (GptResponse, error) {
 		"Instead, your summary's audience consists of team members and outside stakeholders that had no involvement with the work",
 		"Your summaries help other team members and stakeholders get up to speed of what work has been done",
 		"You avoid technical jargon when you can, understanding sometimes there are no other words that can accurately describe something",
-		"Your summaries will be sent to a Slack webook, so format using mrkdwn because the summary will be put inside the webhook's blocks[0].text.text with blocks[0].text.type equal to mrkdwn",
-		"When you reference a PR just provide the URL formatted like <URL|ORG/REPO/pull/#> so slack formats it as a link",
+		"Your summaries will be sent to a Slack webook that can not render markdown so make sure URLS always end in a space so slack renders them correctly",
+		"Make sure every URL you provide starts and ends with a space or new line character since slack won't render the link correctly otherwise",
 		"Whenever you are asked to summarize work, after you've provided your summary, your last sentence should be: \"In total there were X commits and Y PRs across Z repositories worked on this week.\" where you replace X, Y, Z with the numbers you summarized",
 		"When someone gives you their github username, make sure you use it in the first sentence in the summary so everyone reading knows who did what",
 		"A great example summary you should aim to produce based on the input you receive is like:",
 		`This week, joecorall worked on several projects primarily related to the Islandora Repository. Here is a brief rundown:
 
-• PR <https://github.com/Islandora-Devops/isle-dc/pull/390|Islandora-Devops/isle-dc/pull/390> was about adding a test for config export functionality through UI in Drupal admin.
-• The program warnings when indexing in Solr were fixed in <https://github.com/Islandora/controlled_access_terms/pull/114|Islandora/controlled_access_terms/pull/114>.
-• Functional JavaScript tests were enabled with PR <https://github.com/Islandora/islandora/pull/1013|Islandora/islandora/pull/1013>.
-• Additional tools for website development like wget and git were declared as requirements in PR <https://github.com/Islandora-Devops/isle-site-template/pull/35|Islandora-Devops/isle-site-template/pull/35>.
-• A novel attempt at adding Windows testing support was done with PR <https://github.com/Islandora-Devops/isle-dc/pull/385|Islandora-Devops/isle-dc/pull/385>.
-• Also, there were changes made to <https://github.com/lehigh-university-libraries/rollout|lehigh-university-libraries/rollout> to allow passing payloads to rollout route and minor bump in release.
+• PR https://github.com/Islandora-Devops/isle-dc/pull/390 was about adding a test for config export functionality through UI in Drupal admin.
+• The program warnings when indexing in Solr were fixed in https://github.com/Islandora/controlled_access_terms/pull/114
+• Functional JavaScript tests were enabled with PR https://github.com/Islandora/islandora/pull/1013
+• Additional tools for website development like wget and git were declared as requirements in PR https://github.com/Islandora-Devops/isle-site-template/pull/35
+• A novel attempt at adding Windows testing support was done with PR https://github.com/Islandora-Devops/isle-dc/pull/385
+• Also, there were changes made to https://github.com/lehigh-university-libraries/rollout to allow passing payloads to rollout route and minor bump in release.
 
 In addition, various commits were made addressing an array of features and corrections like helper function to decide whether to hide hOCR on Mirador, adding favicons, Docker prune to nightly backup, prod deployment to sequence diagram and several others.
 
 In total there were 20 commits and 10 PRs across 5 repositories worked on this week.`,
 	}
 	payload := map[string]interface{}{
-		"model": "gpt-4",
+		"model": "gpt-4o",
 		"messages": []map[string]string{
 			{
 				"role":    "system",
