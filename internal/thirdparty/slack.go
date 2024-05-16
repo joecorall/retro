@@ -15,19 +15,7 @@ func SendToSlack(webhookURL, summary string) error {
 		return fmt.Errorf("SLACK_WEBHOOK_URL is not set")
 	}
 
-	jsonData := []byte(fmt.Sprintf(`
-	{
-		"text": "This week's summary",
-		"blocks": [
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "%s"
-				}
-			}
-		]
-	}`, summary))
+	jsonData := []byte(fmt.Sprintf(`{"text":"%s"}`, summary))
 	req, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return fmt.Errorf("error creating request: %v", err)
